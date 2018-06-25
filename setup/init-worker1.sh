@@ -3,3 +3,5 @@ diff /etc/systemd/system/kubelet.service.d/10-kubeadm.conf 10-kubeadm.conf
 sudo mv -f 10-kubeadm.conf /etc/systemd/system/kubelet.service.d/
 sudo systemctl daemon-reload
 sudo systemctl restart kubelet
+
+kubeadm join 172.16.20.11:6443 --token ${TOKEN} --discovery-token-ca-cert-hash sha256:${HASH}
