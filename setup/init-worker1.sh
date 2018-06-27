@@ -5,3 +5,11 @@ sudo systemctl daemon-reload
 sudo systemctl restart kubelet
 
 kubeadm join 172.16.20.11:6443 --token ${TOKEN} --discovery-token-ca-cert-hash sha256:${HASH}
+
+# ensure worker cluster joined
+kubectl get node
+
+kubectl label node worker1 node-role.kubernetes.io/node=node "worker1" labeled
+
+# ensure pod working
+kubectl get pod -o wide -n kube-system
