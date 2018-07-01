@@ -14,18 +14,18 @@ Vagrant.configure(2) do |config|
   #config.ssh.private_key_path = "~/.ssh/piyo.pem"
   #config.ssh.forward_agent = true
     
-#  config.vm.define :wterm do |node|
-#    node.vm.network :forwarded_port, guest: 22, host: 2889, id: "ssh"
-#    node.vm.network :private_network, ip: "192.168.33.19"
-#
-#    node.vm.provider :virtualbox do |v|
-#      v.customize["modifyvm", :id, "--memory", "1024"]
-#    end
-#
-#    node.vm.provision :shell, path: "setup/init-ansible.sh"
-#    node.vm.provision :shell, path: "setup/add-hosts.sh"
-#    node.vm.synced_folder "synced/", "/home/vagrant/synced"
-#  end
+  config.vm.define :wterm do |node|
+    node.vm.network :forwarded_port, guest: 22, host: 2889, id: "ssh"
+    node.vm.network :private_network, ip: "192.168.33.19"
+
+    node.vm.provider :virtualbox do |v|
+      v.customize["modifyvm", :id, "--memory", "1024"]
+    end
+
+    node.vm.provision :shell, path: "setup/init-ansible.sh"
+    node.vm.provision :shell, path: "setup/add-hosts.sh"
+    node.vm.synced_folder "synced/", "/home/vagrant/synced"
+  end
 
   config.vm.define :master do |node|
     node.vm.network :forwarded_port, guest: 22, host: 2900, id: "ssh"
