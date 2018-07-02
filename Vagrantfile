@@ -25,6 +25,7 @@ Vagrant.configure(2) do |config|
     node.vm.provision :shell, path: "setup/init-ansible.sh"
     node.vm.provision :shell, path: "setup/add-hosts.sh"
     node.vm.synced_folder "synced/", "/home/vagrant/synced"
+    node.vm.synced_folder "ansible/", "/home/vagrant/ansible"
   end
 
   config.vm.define :master do |node|
