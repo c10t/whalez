@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>The Todo</title>
+  <link rel="stylesheet" href="stylesheets/style.css" />
+  <script src="//code.jquery.com/jqueury-2.1.3.min.js"></script>
+</head>
+<body>
+  <h1>Todos</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% rows.forEach(function(row) { %>
+      <tr>
+        <td><a href="/todos/<%= row.id %>"><%= row.id %></a></td>
+        <td><%= row.title %></td>
+        <td><a href="/todos/edit/<%= row.id %>">Edit</a></td>
+        <td><a href="javascript:void(0);"
+          onclick="deleteWithConfirm(<%= row.id %>)">Delete</a></td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <div><a href="todos/create">add new todo</a></div>
+  <script>
+    function deleteWithConfirm(id) {
+      if (confirm('Delete this?')) {
+        $.ajax({
+          url: '/todos/' + id,
+          type: 'DELETE'
+        })
+        .done(function() {location.reload();})
+        .fail(function(error) {
+          console.error(error);
+          alert("Failed to delete todo");
+        });
+      }
+    }
+  </script>
+</body>
+</html>
