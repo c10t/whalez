@@ -6,6 +6,7 @@
     "start": "nodemon -L ./bin/www"
   },
   "dependencies": {
+    "aws-sdk": "^2.315.0",
     "bluebird": "^3.5.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
