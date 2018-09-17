@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1 Todos
+  div.siimple-table--striped
+    div.siimple-table-header
+      div.siimple-table-row
+        div.siimple-table-cell ID
+        div.siimple-table-cell Title
+        div.siimple-table-cell Edit
+        div.siimple-table-cell Delete
+    div.siimple-table-body
+      each row in rows
+        div.siimple-table-row
+          div.siimple-table-cell= row.id
+          div.siimple-table-cell= row.title
+          div.siimple-table-cell= 'edit-' + row.id
+          div.siimple-table-cell= 'delete-' + row.id
