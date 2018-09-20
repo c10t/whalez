@@ -1,8 +1,12 @@
 var express = require('express');
 var Promise = require('bluebird');
 var mysql = require('mysql');
-var AWS = require('aws-sdk');
+var redis = require('redis');
+// var AWS = require('aws-sdk');
+
 var router = express.Router();
+
+// var getAll = require('./todo-service').getAll;
 
 /*
 const mockrows = [
@@ -42,28 +46,13 @@ var s3config = {
 const s3bucket = process.env.AWS_S3_BUCKET;
 const imageUrlEndpoint = process.env.IMAGE_ENDPOINT;
 
-var s3 = Promise.promisifyAll(new AWS.S3(s3config));
+// var s3 = Promise.promisifyAll(new AWS.S3(s3config));
 
-// Error Definition
-class InsertTodoError extends Error {
-  constructor ( message, extra ) {
-    super()
-    Error.captureStackTrace( this, this.constructor )
-    this.name = 'InsertTodoError'
-    this.message = message
-    if ( extra ) this.extra = extra
-  }
-}
-
-class DeleteTodoNotFoundError extends Error {
-  constructor ( message, extra ) {
-    super()
-    Error.captureStackTrace( this, this.constructor )
-    this.name = 'DeleteTodoNotFoundError'
-    this.message = message
-    if ( extra ) this.extra = extra
-  }
-}
+Promise.promisifyAll(redis.RedisClient.prototype);
+var redisClient = redis.createClient({
+  host : process.env.REDIS_HOST,
+  port : process.env.REDIS_PORT
+});
 
 router.get('/', (req, res, next) => {
   pool.queryAsync('SELECT * FROM todos')
@@ -77,20 +66,30 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   const id = req.params.id;
 
-  pool.queryAsync('SELECT * FROM todos WHERE id = ?', [id])
-  .then(rows => {
-    const row = rows[0];
-    if (!row) return res.sendStatus(404);
+  redisClient.getAsync(id).then(response => {
+    console.log("get: " + JSON.stringify(response));
+    if (rersponse) {
+      console.log("render from cache...");
+      const row = JSON.parse(response);
+      res.render('todos/show', { row: row, imageUrlEndpoint: imageUrlEndpoint });
+    } else {
+      pool.queryAsync('SELECT * FROM todos WHERE id = ?', [id])
+      .then(rows => {
+        const row = rows[0];
+        if (!row) return res.sendStatus(404);
 
-    res.render('todos/show', { row: row });
+        res.render('todos/show', { row: row });
+      })
+      .catch(error => next(error));
+    }
   })
-  .catch(error => next(error));
+  .catch(err => { console.log("redis error:" + err); });
 });
 
 /* Create or Edit Todo */
-router.post('/edit'. upload.single('image'), (req, res, next) => {});
+// router.post('/edit'. upload.single('image'), (req, res, next) => {});
 
 /* Delete Todo */
-router.delete('/:id', (req, res, next) => {});
+// router.delete('/:id', (req, res, next) => {});
 
 module.exports = router;
