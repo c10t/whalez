@@ -29,6 +29,12 @@ services:
       - MYSQL_DB=develop
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+    volumes:
+      # realtime codesync with nodemon
+      # node_modules becomes empty by line 1,
+      # so mount /app/node_modules in the container again in line 2.
+      - ".:/app"
+      - "/app/node_modules"
     depends_on:
       - mysql
       - redis
