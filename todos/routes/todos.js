@@ -2,11 +2,13 @@ var express = require('express');
 var Promise = require('bluebird');
 var mysql = require('mysql');
 var redis = require('redis');
-// var AWS = require('aws-sdk');
+var AWS = require('aws-sdk');
+var multer = require('multer');
+var upload = multer({ dest: '/tmp' });
 
 var router = express.Router();
 
-// var getAll = require('./todo-service').getAll;
+var editTodo = require('./todo-service').editTodo;
 
 /*
 const mockrows = [
@@ -40,13 +42,23 @@ var pool = Promise.promisifyAll(mysql.createPool({
 
 var s3config = {
   accessKey : process.env.AWS_ACCESS_KEY,
-  secretKey : process.env.AWS_SECRET_KEY
+  secretKey : process.env.AWS_SECRET_KEY,
+  region    : process.env.AWS_REGION
 };
+
+// for emulating S3
+if (process.env.AWS_ENDPOINT) {
+  const endpoint = process.env.AWS_ENEDPOINT
+  const port     = process.env.AWS_PORT
+  s3Config['endpoint'] = endpoint + ':' + port
+  s3Config['s3ForcePathStyle'] = true;
+  s3Config['signatureVersion'] = 'V4'
+}
+
+var s3 = Promise.promisifyAll(new AWS.S3(s3config));
 
 const s3bucket = process.env.AWS_S3_BUCKET;
 const imageUrlEndpoint = process.env.IMAGE_ENDPOINT;
-
-// var s3 = Promise.promisifyAll(new AWS.S3(s3config));
 
 Promise.promisifyAll(redis.RedisClient.prototype);
 var redisClient = redis.createClient({
@@ -86,8 +98,12 @@ router.get('/:id', (req, res, next) => {
   .catch(err => { console.log("redis error:" + err); });
 });
 
-/* Create or Edit Todo */
-// router.post('/edit'. upload.single('image'), (req, res, next) => {});
+/* insert or update Todo */
+router.post('/edit'. upload.single('image'), (req, res, next) => {
+  console.log("file: " + JSON.stringify(req.file));
+  const id    = req.body.id;
+  const title = req.body.title; 
+});
 
 /* Delete Todo */
 // router.delete('/:id', (req, res, next) => {});
