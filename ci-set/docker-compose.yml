@@ -1,0 +1,59 @@
+version: '3'
+
+networks:
+  ci:
+    external: false
+
+services:
+  drone:
+    image: drone/drone:1.0.0-rc5
+    restart: always
+    networks:
+      - ci
+    ports:
+      - 3080:80
+      - 3443:443
+    volumes:
+      - ./.drone/data:data
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_GIT_ALWAYS_AUTH=false
+      - DRONE_GITEA_SERVER=http://192.168.56.1:3000
+      - DRONE_RUNNER_CAPACITY=2
+      - DRONE_SERVER_HOST=192.168.56.1:3080
+      - DRONE_SERVER_PROTO=http
+      - DRONE_TLS_AUTOCERT=false
+  gitea-ap:
+    image: gitea/gitea:latest
+    restart: always
+    depends_on:
+      - gitea-db
+    networks:
+      - ci
+    ports:
+      - 3000:3333
+      - 3222:22
+    volumes:
+      - ./.gitea/data:/data
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - SSH_PORT=22
+      - HTTP_PORT=3333
+      - ROOT_URL=http://192.168.56.1:3000/
+      - DB_TYPE=postgres
+      - DB_HOST=gitea-db:5432
+      - DB_NAME=gitea
+      - DB_USER=gitea
+      - DB_PASSWD=gitea
+  gitea-db:
+    image: postgres:9.6
+    restart: always
+    networks:
+      - ci
+    volumes:
+      - ./.postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=gitea
+      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_DB=gitea
